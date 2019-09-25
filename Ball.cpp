@@ -1,7 +1,7 @@
 #include "pingpong.h"
 #include <stdlib.h>
 
-ball::ball(int posx, int posy)
+Ball::Ball(int posx, int posy)
 {
     originalx = posx;
     originaly = posy;
@@ -10,19 +10,19 @@ ball::ball(int posx, int posy)
     direction = stop;
 }
 
-void ball::reset() 
+void Ball::reset() 
 {
     x = originalx;
     y = originaly;
     direction = stop;
 }
 
-void ball::random()
+void Ball::random()
 {
     direction = (edir)((rand() % 6) + 1);
 }
 
-void ball::move() 
+void Ball::move() 
 {
     switch (direction)
     {

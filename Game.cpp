@@ -2,39 +2,58 @@
 #include <time.h>
 #include <stdlib.h>
 
-gamemanager::gamemanager(int w, int h)
+void Game::initwindow(int height, int width)
+{
+    this->videoMode.height = height;
+    this->videoMode.width = width;
+    window = new sf::RenderWindow(videoMode, "Ping Pong", sf::Style::Titlebar | sf::Style::Close);
+}
+
+Game::Game()
+{
+    Game(800,600,10);
+}
+
+Game::Game(int w, int h, int paddleSize)
 {
     srand(time(NULL));
+
+    this->window = nullptr;
+
     quit = false;
     up1 = 'w';
     up2 = 'i';
     down1 = 's';
     down2 = 'k';
-    score1 = score2 = 0;
-    width = w; height = h;
-    cball = new ball(w / 2, h / 2);
-    player1 = new paddle(1, h / 2 - 3);
-    player2 = new paddle(w - 2, h / 2 - 3);
+    
+    ball = new Ball(w / 2, h / 2);
+    player1 = new Paddle(5, h / 2 , paddleSize);
+    player2 = new Paddle(w - 5, h / 2 , paddleSize);
+    initwindow(h,w);
 }
 
-gamemanager::~gamemanager()
+Game::~Game()
 {
-    delete cball, player1, player2;
+    delete window, ball, player1, player2;
 }
 
-void gamemanager::scoreup(paddle * player)
+void Game::scoreup(Paddle * player)
 {
-    if (player == player1)
-        score1++;
-    else if (player == player2)
-        score2++;
+    player->scoreup();    
+    ball->reset();
+    player1->reset();
+    player2->reset();
+}
 
-    cball->reset();
+void Game::scoredown(Paddle * player)
+{
+    player->scoredown();    
+    ball->reset();
     player1->reset();
     player2->reset();
 }
 /*
-void gamemanager::draw()
+void Game::draw()
 {
     system("cls");
     for (int i = 0; i < width + 2; i++)
@@ -45,8 +64,10 @@ void gamemanager::draw()
     {
         for (int j = 0; j <= width; j++)
         {
-            int ballx = cball->getx();
-            int bally = cball->gety();
+            int ballx = 
+            ball->getx();
+            int bally = 
+            ball->gety();
             int player1x = player1->getx();
             int player2x = player2->getx();
             int player1y = player1->gety();
@@ -89,12 +110,15 @@ void gamemanager::draw()
 */
 
 /*
-void gamemanager::input() 
+void Game::input() 
 {
-    cball->move();
+    
+    ball->move();
 
-    int ballx = cball->getx();
-    int bally = cball->gety();
+    int ballx = 
+    ball->getx();
+    int bally = 
+    ball->gety();
     int player1x = player1->getx();
     int player2x = player2->getx();
     int player1y = player1->gety();
@@ -116,8 +140,10 @@ void gamemanager::input()
             if (player2y + 4 < height)
                 player2->movedown();
 
-        if (cball->getdirection() == stop)
-            cball->random();
+        if (
+            ball->getdirection() == stop)
+            
+            ball->random();
 
         if (current == 'q')
             quit = true;
@@ -126,50 +152,72 @@ void gamemanager::input()
 }
 */
 
-void gamemanager::logic()
+void Game::logic()
 {
-    int ballx = cball->getx();
-    int bally = cball->gety();
-    int player1x = player1->getx();
+    int ballx = ball->getx();
+    int bally = ball->gety();
     int player2x = player2->getx();
     int player1y = player1->gety();
     int player2y = player2->gety();
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < player1->getsize(); i++)
     {
-        if (ballx == player1x + 1)
-            if (bally = player1y + i)
-                cball->changedirection((edir)((rand() % 3) + 4));
+        if (  -3 < ballx - player1->getx() < 3 )
+            if (bally = player1->gety() + i)
+                ball->changedirection((edir)((rand() % 3) + 4));
     }
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < player2->getsize(); i++)
     {
-        if (ballx == player2x - 1)
-            if (bally = player2y + i)
-                cball->changedirection((edir)((rand() % 3) + 1));
+        if ( -3 < ballx - player2->getx() < 3)
+            if (bally = player2->gety() + i)
+                ball->changedirection((edir)((rand() % 3) + 1));
     }
 
-    if (bally == height - 1)
+    if (bally == videoMode.height - 1)
     {
-        cball->changedirection(cball->getdirection() == downright ? upright : upleft);
+        ball->changedirection(
+            ball->getdirection() == downright ? upright : upleft);
     }
     
     if (bally == 0)
     {
-        cball->changedirection(cball->getdirection() == upright ? downright : downleft);
+        ball->changedirection(
+            ball->getdirection() == upright ? downright : downleft);
     }
-    if (ballx == width - 1)
+    if (ballx == videoMode.width - 1)
         scoreup(player1);
     if (ballx == 0)
         scoreup(player2);
 }
 
-void gamemanager::run()
+void Game::run()
 {
-    while (!quit) 
+    while (window->pollEvent(ev))
     {
-        draw();
-        input();
-        logic();
+        switch (ev.type)
+        {
+        case sf::Event::Closed :
+            window->close();
+            break;
+        case sf::Event::KeyPressed :
+            if(ev.key.code == sf::Keyboard::Escape)
+                window->close();
+            break;
+
+        default:
+            break;
+        }
     }
+    // Input
+    
+    // Update
+    logic();
+    
+    // Render
+    window->clear(sf::Color(0,0,255,255));
+    
+    // Draw 
+
+    window->display();
 }

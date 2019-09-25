@@ -1,11 +1,17 @@
 #pragma once
 
+#include<SFML/Window.hpp>
+#include<SFML/Graphics.hpp>
+#include<SFML/Audio.hpp>
+#include<SFML/System.hpp>
+#include<SFML/Network.hpp>
+
 enum edir
 {
 	stop, Left , upleft, downleft , Right, upright, downright
 };
 
-class ball
+class Ball
 {
 private:
 	
@@ -14,7 +20,7 @@ private:
 	edir direction;
 
 public:
-	ball(int posx, int posy);
+	Ball(int posx, int posy);
 
 	void reset();
 
@@ -44,17 +50,17 @@ public:
 	void move() ;
 };
 
-class paddle
+class Paddle
 {
 private:
 	
     int x, y;
 	int originalx, originaly;
+	int score;
+	int size;
 
 public:
-	paddle();
-
-	paddle(int posx, int posy);
+	Paddle(int posx, int posy, int size);
 
 	inline void reset()
 	{
@@ -81,24 +87,58 @@ public:
 	{
 		y++;
 	}
+
+	inline void scoreup()
+	{
+		score += 1;
+	}
+
+	inline void scoredown()
+	{
+		score += -1;
+	}
+
+	inline int getscore()
+	{
+		return score;
+	}
+
+	inline int getsize()
+	{
+		return size;
+	}
 };
 
-class gamemanager
+class Game
 {
 private:
-	int score1, score2;
+	sf::RenderWindow *window;
+	sf::VideoMode videoMode;
+	sf::Event ev;
+
 	char up1, up2, down1, down2;
-	int width, height;
 	bool quit;
-	ball *cball;
-	paddle *player1;
-	paddle *player2;
+	
+	Ball *ball;
+	Paddle *player1;
+	Paddle *player2;
+
+	void initwindow(int h, int w);
 public:
-	gamemanager(int w, int h);
+	Game();
 
-	~gamemanager();
+	Game(int w, int h, int s);
 
-	void scoreup(paddle * player);
+	~Game();
+
+	void scoreup(Paddle * player);
+
+	void scoredown(Paddle * player);
+
+	inline bool running()
+	{
+		return window->isOpen();
+	}
 
 	void draw();
 

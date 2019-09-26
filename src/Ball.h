@@ -40,6 +40,7 @@ public:
 		return radius;
 	}
 
+	void deflect(sf::VideoMode videoMode);
 	void move(double time_diff);
-	void collide(float surfaceAngle, bool);
+	void collide(float surfaceAngle);
 };

@@ -70,5 +70,10 @@ public:
 		return width;
 	}
 
+	inline void scaleSize(float factor)
+	{
+		length = length * factor;
+	}
+
 	bool isColliding(Ball *  ball);
 };

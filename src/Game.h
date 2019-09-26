@@ -1,17 +1,12 @@
 #pragma once
 
-#include<SFML/Window.hpp>
-#include<SFML/Graphics.hpp>
-#include<SFML/Audio.hpp>
-#include<SFML/System.hpp>
-#include<SFML/Network.hpp>
-
 #include <chrono>
 #include <thread>
 #include<string>
 
 #include "Paddle.h"
 #include "Ball.h"
+#include <vector>
 
 class Game
 {
@@ -20,11 +15,13 @@ private:
 	sf::VideoMode videoMode;
 	sf::Event ev;
 
-	Ball *ball;
-	Paddle *player1;
+	std::vector<Ball * > balls;
+	Paddle *player1; 
 	Paddle *player2;
 
 	void initwindow(int h, int w);
+	sf::CircleShape * initping(Ball *);
+
 	void parseCode();
 
 	double time_diff;
@@ -34,7 +31,12 @@ private:
 	sf::Text displayText;
 
 	sf::RectangleShape paddle1,paddle2;
-	sf::CircleShape ping;
+	std::vector<sf::CircleShape *> pings;
+
+	bool pl1Flag;
+	bool pl2Flag;
+	int currentScoreLimit;
+
 public:
 
 	Game(int w, int h);
@@ -44,6 +46,8 @@ public:
 	void scoreup(Paddle * player);
 
 	void scoredown(Paddle * player);
+
+	void reset();
 
 	inline bool running()
 	{

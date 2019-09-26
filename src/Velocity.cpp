@@ -15,12 +15,21 @@ void Velocity::move(float & x, float & y, double time_diff)
     y += magnitude*sin(angle) * time_diff;
 }
 
-void Velocity::collision(float surfaceAngle, bool ran=false)
+void Velocity::collision(float surfaceAngle)
 {
+
     float diff = angle - surfaceAngle;
     angle = PI - diff;
-    if(ran)
+    if(cos(angle) < 1.f/4 && cos(angle) > -1.f/4)
     {
-        angle += 2*((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) - 1) * (PI/6) * (cos(angle) > 0 ? -1 : 1);
+        if(sin(angle) > 0 && cos(angle) > 0)
+        {
+            angle -= PI/8.f;
+        }
+        else
+        {
+            angle += PI/8.f;
+        }
+        
     }
 }

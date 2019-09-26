@@ -11,17 +11,12 @@ void Game::initwindow(int height, int width)
 
     paddle1 =  sf::RectangleShape(sf::Vector2f(player1->getwidth(), player1->getsize()));
     paddle2 =  sf::RectangleShape(sf::Vector2f(player2->getwidth(), player2->getsize()));
-    ping = sf::CircleShape(50);
+    
 
     paddle1.setFillColor(sf::Color::Red);
     paddle2.setFillColor(sf::Color::Red);
 
-    ping.setFillColor(sf::Color::Green);
-    ping.setRadius(ball->getRadius());
-    ping.setOutlineColor(sf::Color::Blue);
-    ping.setOutlineThickness(ball->getRadius()/3);
-
-    if(!font.loadFromFile("src/Fonts/aerial.ttf"))
+    if(!font.loadFromFile("/home/parth/SFML_C-_Simple_Games/pingpong/src/Fonts/aerial.ttf"))
     {
         throw "Unable To load font!";
     }
@@ -41,7 +36,10 @@ Game::Game(int w, int h)
 
     player1 = new Paddle(15,h/2,60,16,h);
     player2 = new Paddle(w - 15,h/2,60,16,h);
-    ball = new Ball(w/2,h/2 +10, 10);
+    
+    pl1Flag = false;
+    pl2Flag = false;
+    currentScoreLimit = 0;
 
     initwindow(h,w);
 }
@@ -49,57 +47,100 @@ Game::Game(int w, int h)
 Game::~Game()
 {
     delete window;
-    delete ball; 
+    for(Ball * ball : balls)
+        delete ball; 
     delete player1;
     delete player2;
+}
+
+void Game::reset()
+{
+    for(Ball * ball : balls)
+        ball->reset();
+    player1->reset();
+    player2->reset();
 }
 
 void Game::scoreup(Paddle * player)
 {
     player->scoreup();    
-    ball->reset();
-    player1->reset();
-    player2->reset();
 }
 
-void Game::scoredown(Paddle * player)
+sf::CircleShape * Game::initping(Ball * ball)
 {
-    player->scoredown();    
-    ball->reset();
-    player1->reset();
-    player2->reset();
+    sf::CircleShape * ping = new sf::CircleShape(50);
+    ping->setFillColor(sf::Color::Green);
+    ping->setRadius(ball->getRadius());
+    ping->setOutlineColor(sf::Color::Black);
+    ping->setOutlineThickness(ball->getRadius()/3);
+    return ping;
 }
 
 void Game::logic()
 {
-    int ballx = ball->getx();
-    int bally = ball->gety();
-    
-    if(player1->isColliding(ball))
+    if( (player1->getscore() >= currentScoreLimit)| (player2->getscore() >= currentScoreLimit))
     {
-        ball->collide(0,false);
+        currentScoreLimit += 3;
+        Ball * tempBall = new Ball(videoMode.width/2,videoMode.height/2 +10, 10);
+        balls.push_back(tempBall);
+        pings.push_back(initping(tempBall));
+        player1->scaleSize(1.3);
+        paddle1.scale(sf::Vector2f(1,1.3));
+        player2->scaleSize(1.3);
+        paddle2.scale(sf::Vector2f(1,1.3));
     }
-    if(player2->isColliding(ball))
+
+    for(Ball * ball : balls)
     {
-        ball->collide(0,false);
+        int ballx = ball->getx();
+        int bally = ball->gety();
+        
+        if(player1->isColliding(ball))
+        {
+            if (!pl1Flag)
+            {
+                ball->collide(0);
+                pl1Flag = true;
+            }
+        }
+        else
+        {
+            pl1Flag = false;
+        }
+        
+        if(player2->isColliding(ball))
+        {
+            if (!pl2Flag)
+            {
+                pl2Flag = true;
+                ball->collide(0);
+            }
+        }
+        else
+        {
+            pl2Flag = false;
+        }
+        if(fabs((double)(bally - videoMode.height)) < ball->getRadius() )
+        {
+            ball->collide(PI);
+        }
+        if(bally < ball->getRadius() )
+        {
+            ball->collide(PI);
+        }
+        if ( fabs((double)(ballx - videoMode.width)) < ball->getRadius() )
+        {    
+            player1->scoreup();
+            ball->reset();
+        }
+        if (ballx < ball->getRadius())
+        {    
+            player2->scoreup();
+            ball->reset();
+        }
+        ball->move(time_diff);
+        ball->deflect(videoMode);
     }
-    if(fabs((double)(bally - videoMode.height)) < ball->getRadius() )
-    {
-        ball->collide(PI,false);
-    }
-    if(bally < ball->getRadius() )
-    {
-        ball->collide(PI,true);
-    }
-    if ( fabs((double)(ballx - videoMode.width)) < ball->getRadius() )
-    {    
-        scoreup(player1);
-    }
-    if (ballx < ball->getRadius())
-    {    
-        scoreup(player2);
-    }
-    ball->move(time_diff);
 }
 
 void Game::render()
@@ -107,12 +148,19 @@ void Game::render()
 
     paddle1.setPosition(sf::Vector2f(player1->getx()-player1->getwidth()/2,player1->gety()-player1->getsize()/2));
     paddle2.setPosition(sf::Vector2f(player2->getx()-player2->getwidth()/2,player2->gety()-player2->getsize()/2));
-    ping.setPosition(sf::Vector2f(ball->getx(),ball->gety()));
+    
+    for(size_t i=0 ; i < balls.size() ; i++)
+    {
+        pings[i]->setPosition(sf::Vector2f(balls[i]->getx(),balls[i]->gety()));
+    }
     displayText.setString(message);
     
     window->draw(paddle1);
     window->draw(paddle2);
-    window->draw(ping);
+    for(sf::CircleShape * ping : pings)
+    {
+        window->draw(*ping);
+    }
     window->draw(displayText);
 }
 
@@ -162,7 +210,7 @@ void Game::run(int fps)
     logic();
     
     // Render
-    window->clear(sf::Color(40,199,235,255));
+    window->clear(sf::Color(17,242,160,255));
     render();
     window->display();
     // Draw 
@@ -170,6 +218,6 @@ void Game::run(int fps)
     window->display();
 
     message = "Player 1 Score : " + std::to_string(player1->getscore()) + " Player 2 Score : " + std::to_string(player2->getscore())+
-                "\n Ball Velocity : " + std::to_string((int)ball->getVelocity().getVelocity()) + " Ball X,Y : " + std::to_string((int)ball->getx()) + " , " + std::to_string((int)ball->gety()) + 
-                "\n Fps : " + std::to_string((int)(1.0 / time_diff))+ "\n";
+            "\nBalls : " + std::to_string(balls.size()) +
+            "\nFps : " + std::to_string((int)(1.0 / time_diff))+ "\n";
 }

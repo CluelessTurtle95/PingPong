@@ -4,6 +4,8 @@
 #include <ctime>
 #include <stdlib.h>
 
+const float PI = atan(1)*4; 
+
 class Velocity
 {
 	private:
@@ -13,8 +15,16 @@ class Velocity
 	time_t time_last_call;
 
 	public:
+	float inline getVelocity()
+	{
+		return magnitude;
+	}
+	float inline getAngle()
+	{
+		return angle;
+	}
 	Velocity();
-	void move(float & x, float & y);
-	void collision(float surfaceAngle);
+	void move(float & x, float & y, double time_diff);
+	void collision(float surfaceAngle,bool);
 
 };

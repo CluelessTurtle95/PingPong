@@ -6,6 +6,10 @@
 #include<SFML/System.hpp>
 #include<SFML/Network.hpp>
 
+#include <chrono>
+#include <thread>
+#include<string>
+
 #include "Paddle.h"
 #include "Ball.h"
 
@@ -16,17 +20,22 @@ private:
 	sf::VideoMode videoMode;
 	sf::Event ev;
 
-	char up1, up2, down1, down2;
-	bool quit;
-	
 	Ball *ball;
 	Paddle *player1;
 	Paddle *player2;
 
 	void initwindow(int h, int w);
+	void parseCode();
+
+	double time_diff;
+
+	std::string message;
+    
+	sf::RectangleShape paddle1,paddle2;
+	sf::CircleShape ping;
 public:
 
-	Game(int w, int h, int s);
+	Game(int w, int h);
 
 	~Game();
 
@@ -39,9 +48,14 @@ public:
 		return window->isOpen();
 	}
 
+	inline std::string getMessage()
+	{
+		return message;
+	}
+
 	void render();
 
 	void logic();
 
-	void run();
+	void run(int fps);
 };

@@ -1,29 +1,26 @@
-# include "pingpong.h"
-
-const float PI = atan(1)*4; 
-const int VMax = 2;
-const int VMin = 1;
-
+#include"Velocity.h"
+#include <iostream>
+const int VMax = 500;
+const int VMin = 400;
 
 Velocity::Velocity()
 {
-    time_last_call = time(nullptr);
-    magnitude = VMin + (rand() % VMax + 1);
-    angle = PI * (rand() % 4) / 2; 
+    magnitude = VMin + (rand() % (VMax-VMin) + 1);
+    angle = 2* PI * static_cast <float> (rand()) / static_cast <float> (RAND_MAX); 
 }
 
-void Velocity::move(float & x, float & y)
+void Velocity::move(float & x, float & y, double time_diff)
 {
-    time_t current = time(nullptr);
-    float diff = current - time_last_call;
-    time_last_call = current;
-    x += magnitude*cos(angle) * diff;
-    y += magnitude*sin(angle) * diff;
+    x += magnitude*cos(angle) * time_diff;
+    y += magnitude*sin(angle) * time_diff;
 }
 
-void Velocity::collision(float surfaceAngle)
+void Velocity::collision(float surfaceAngle, bool ran=false)
 {
     float diff = angle - surfaceAngle;
     angle = PI - diff;
-    angle += (rand() % 20 - 10)/100 * (diff-PI/2); // Differ by about 10 percent
+    if(ran)
+    {
+        angle += 2*((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) - 1) * (PI/6) * (cos(angle) > 0 ? -1 : 1);
+    }
 }

@@ -11,7 +11,7 @@ private:
 	Velocity velocity;
 
 public:
-	Ball(float posx, float posy);
+	Ball(float posx, float posy, float r);
 
 	void reset();
 
@@ -40,5 +40,6 @@ public:
 		return radius;
 	}
 
-	void move() ;
+	void move(double time_diff);
+	void collide(float surfaceAngle, bool);
 };

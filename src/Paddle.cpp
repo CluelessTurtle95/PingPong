@@ -1,6 +1,6 @@
 #include "Paddle.h"
 
-Paddle::Paddle(int posx, int posy, int s)
+Paddle::Paddle(int posx, int posy, int s, int w, int gH)
 {
     originalx = posx;
     originaly = posy;
@@ -8,13 +8,15 @@ Paddle::Paddle(int posx, int posy, int s)
     y = posy;
     score = 0;
     length = s;
+    width = w;
+    gameHeight = gH;
 }
 
-bool Paddle::isColliding(Ball ball)
+bool Paddle::isColliding(Ball * ball)
 {
-    if( abs(ball.getx() - x) < width/2 + ball.getRadius())
+    if( fabs((double)(ball->getx() - x)) < width/2 + ball->getRadius())
     {
-        if( abs(ball.gety() - y) < length/2 + ball.getRadius())
+        if( fabs((double)(ball->gety() - y)) < length/2 + ball->getRadius())
         {
             return true;
         }

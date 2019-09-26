@@ -1,10 +1,10 @@
 CXX      := g++
-CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror -g
+CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror
 LDFLAGS  := -L/usr/lib -lstdc++ -lm -lsfml-graphics -lsfml-system -lsfml-window -lsfml-network -lsfml-audio
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
-TARGET   := pingpong
+TARGET   := pong
 INCLUDE  := -Iinclude/
 SRC      :=                      \
     $(wildcard src/module1/*.cpp) \

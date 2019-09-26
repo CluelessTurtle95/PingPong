@@ -1,7 +1,7 @@
 #pragma once
 #include "Ball.h"
 
-const int paddleSensitivity = 1;
+const int paddleSensitivity = 10;
 
 class Paddle
 {
@@ -12,9 +12,10 @@ private:
 	unsigned int score;
 	int length;
 	int width;
+	int gameHeight;
 
 public:
-	Paddle(int posx, int posy, int length);
+	Paddle(int posx, int posy, int length, int width, int gH);
 
 	inline void reset()
 	{
@@ -34,12 +35,14 @@ public:
 
     inline void moveup() 
 	{
-		y += paddleSensitivity;
+		if(y < gameHeight - length/2)
+			y += paddleSensitivity;
 	}
 
 	inline void movedown()
 	{
-		y-= paddleSensitivity;
+		if(y > length/2)
+			y-= paddleSensitivity;
 	}
 
 	inline void scoreup()
@@ -62,5 +65,10 @@ public:
 		return length;
 	}
 
-	bool isColliding(Ball ball);
+    inline int getwidth()
+	{
+		return width;
+	}
+
+	bool isColliding(Ball *  ball);
 };

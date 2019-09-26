@@ -2,9 +2,35 @@
 
 void Game::initwindow(int height, int width)
 {
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+    
     this->videoMode.height = height;
     this->videoMode.width = width;
-    window = new sf::RenderWindow(videoMode, "Ping Pong", sf::Style::Titlebar | sf::Style::Close);
+    window = new sf::RenderWindow(videoMode, "Ping Pong", sf::Style::Titlebar | sf::Style::Close, settings);
+
+    paddle1 =  sf::RectangleShape(sf::Vector2f(player1->getwidth(), player1->getsize()));
+    paddle2 =  sf::RectangleShape(sf::Vector2f(player2->getwidth(), player2->getsize()));
+    ping = sf::CircleShape(50);
+
+    paddle1.setFillColor(sf::Color::Red);
+    paddle2.setFillColor(sf::Color::Red);
+
+    ping.setFillColor(sf::Color::Green);
+    ping.setRadius(ball->getRadius());
+    ping.setOutlineColor(sf::Color::Blue);
+    ping.setOutlineThickness(ball->getRadius()/3);
+
+    if(!font.loadFromFile("src/Fonts/aerial.ttf"))
+    {
+        throw "Unable To load font!";
+    }
+    displayText.setFont(font);
+    displayText.setCharacterSize(12);
+    displayText.setFillColor(sf::Color::Red);
+    displayText.setPosition(sf::Vector2f(videoMode.width/2 - 200 ,videoMode.height -50));
+
+    window->setFramerateLimit(60);
 }
 
 Game::Game(int w, int h)
@@ -18,10 +44,6 @@ Game::Game(int w, int h)
     ball = new Ball(w/2,h/2 +10, 10);
 
     initwindow(h,w);
-
-    paddle1 =  sf::RectangleShape(sf::Vector2f(player1->getwidth(), player1->getsize()));
-    paddle2 =  sf::RectangleShape(sf::Vector2f(player2->getwidth(), player2->getsize()));
-    ping = sf::CircleShape(50);
 }
 
 Game::~Game()
@@ -82,19 +104,12 @@ void Game::logic()
 
 void Game::render()
 {   
-    paddle1.setFillColor(sf::Color::Red);
-    paddle2.setFillColor(sf::Color::Red);
 
     paddle1.setPosition(sf::Vector2f(player1->getx()-player1->getwidth()/2,player1->gety()-player1->getsize()/2));
     paddle2.setPosition(sf::Vector2f(player2->getx()-player2->getwidth()/2,player2->gety()-player2->getsize()/2));
-    ping.setFillColor(sf::Color::Yellow);
-    ping.setRadius(ball->getRadius());
     ping.setPosition(sf::Vector2f(ball->getx(),ball->gety()));
-
-    sf::Text displayText;
     displayText.setString(message);
-    displayText.setPosition(sf::Vector2f(videoMode.width/2,videoMode.height/2));
-    displayText.setFillColor(sf::Color::White);
+    
     window->draw(paddle1);
     window->draw(paddle2);
     window->draw(ping);
@@ -128,7 +143,6 @@ void Game::parseCode()
 void Game::run(int fps)
 {
     time_diff = 1.0/fps;
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
     while (window->pollEvent(ev))
     {
         switch (ev.type)
@@ -148,7 +162,7 @@ void Game::run(int fps)
     logic();
     
     // Render
-    window->clear(sf::Color(0,0,255,255));
+    window->clear(sf::Color(40,199,235,255));
     render();
     window->display();
     // Draw 
@@ -156,6 +170,6 @@ void Game::run(int fps)
     window->display();
 
     message = "Player 1 Score : " + std::to_string(player1->getscore()) + " Player 2 Score : " + std::to_string(player2->getscore())+
-                "\n Ball X,Y : " + std::to_string(ball->getx()) + " , " + std::to_string(ball->gety()) + " Ball Velocity : " + std::to_string(ball->getVelocity().getVelocity()) +
-                "\n Fps : " + std::to_string(1.0 / time_diff)+ "\n";
+                "\n Ball Velocity : " + std::to_string((int)ball->getVelocity().getVelocity()) + " Ball X,Y : " + std::to_string((int)ball->getx()) + " , " + std::to_string((int)ball->gety()) + 
+                "\n Fps : " + std::to_string((int)(1.0 / time_diff))+ "\n";
 }

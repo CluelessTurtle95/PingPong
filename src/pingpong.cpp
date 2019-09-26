@@ -2,7 +2,7 @@
 #include <iostream>
 
 using namespace std;
-bool logger = true;
+bool logger = false;
 
 int main()
 {

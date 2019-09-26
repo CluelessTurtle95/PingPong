@@ -30,7 +30,9 @@ private:
 	double time_diff;
 
 	std::string message;
-    
+    sf::Font font;
+	sf::Text displayText;
+
 	sf::RectangleShape paddle1,paddle2;
 	sf::CircleShape ping;
 public:
